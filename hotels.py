@@ -1,4 +1,5 @@
 from fastapi import Query, Body, APIRouter
+from schemas.hotels import Hotel, HotelPatch
 
 router = APIRouter(prefix="/hotels", tags=['Отели'])
 
@@ -26,36 +27,31 @@ def get_hotels(
 
 
 @router.post('')
-def create_hotel(title: str = Body(embed=True)):
+def create_hotel(hotel_data: Hotel):
     global hotels
-    hotels.append({"id": hotels[-1]["id"] + 1, "title": title})
+    hotels.append({"id": hotels[-1]["id"] + 1, "title": hotel_data.title})
 
 
 @router.put("/{hotel_id}")
-def update_hotel(
-    hotel_id: int, title: str = Body(embed=True), name: str = Body(embed=True)
-):
+def update_hotel(hotel_id: int, hotel_data: Hotel):
     global hotels
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            hotel["title"] = title
-            hotel["name"] = name
+            hotel["title"] = hotel_data.title
+            hotel["name"] = hotel_data.name
     return {"status": "OK"}
 
 
+
 @router.patch("/{hotel_id}")
-def update_patch_hotel(
-    hotel_id: int,
-    title: str | None = Body(None, embed=True),
-    name: str | None = Body(None, embed=True),
-):
+def update_patch_hotel(hotel_id: int, hotel_data: HotelPatch):
     global hotels
     for hotel in hotels:
         if hotel["id"] == hotel_id:
-            if title != "string":
-                hotel["title"] = title
+            if hotel_data.title != "string":
+                hotel["title"] = hotel_data.title
             if hotel != "string":
-                hotel["name"] = name
+                hotel["name"] = hotel_data.name
     return {"status": "OK"}
 
 

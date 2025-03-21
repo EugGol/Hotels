@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 from hotels import router as router_hotels
-from fastapi.security import OAuth2PasswordBearer
+
 
 app = FastAPI()
 
