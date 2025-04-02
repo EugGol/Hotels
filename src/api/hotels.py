@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Query, Body, APIRouter, Depends
 
 from schemas.hotels import Hotel, HotelPatch
-from dependencies import PaginationDep
+from src.api.dependencies import PaginationDep
 
 router = APIRouter(prefix="/hotels", tags=['Отели'])
 
@@ -21,8 +21,8 @@ def get_hotels(
     pagintation: PaginationDep,
     title: str | None = Query(None, description="Название отеля"),
     id: int | None = Query(None, description="айдишник"),
-):
     hotels_ = []
+):
     for hotel in hotels:
         if id and hotel["id"] != id:
             continue
