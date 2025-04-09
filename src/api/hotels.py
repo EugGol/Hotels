@@ -1,12 +1,13 @@
 from fastapi import Query, Body, APIRouter
 
-from sqlalchemy import insert, select, func
+from sqlalchemy import insert, select, func, collate
 
 
 from schemas.hotels import Hotel, HotelPatch
 from src.api.dependencies import PaginationDep
 from src.database import async_sessionmaker_maker, engine
 from src.models.hotels import HotelsOrm
+from repositories.hotels import HotelsRepository
 
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
@@ -16,24 +17,17 @@ router = APIRouter(prefix="/hotels", tags=["Отели"])
 async def get_hotels(
     pagintation: PaginationDep,
     title: str | None = Query(None, description="Название отеля"),
-    location: str | None = Query(None,  description="Адрес отеля")
-    
+    location: str | None = Query(None, description="Адрес отеля"),
 ):
-    async with async_sessionmaker_maker() as session:
-        query = select(HotelsOrm)
-        if title:
-            query = query.where(HotelsOrm.title.ilike(f'%{title}%'))
-        if location:
-            query = query.where(HotelsOrm.location.ilike(f'%{location}%'))
 
-        query = (
-            query
-            .limit(pagintation.per_page)
-            .offset((pagintation.page - 1) * pagintation.per_page)
+    async with async_sessionmaker_maker() as session:
+        return await HotelsRepository(session).get_all(
+            location=location,
+            title=title,
+            limit=pagintation.per_page,
+            offset=(pagintation.page - 1) * pagintation.per_page
         )
-        result = await session.execute(query)
-        hotels = result.scalars().all()
-        return hotels
+        
 
 
 @router.post("")
