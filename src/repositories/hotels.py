@@ -1,28 +1,20 @@
-from sqlalchemy import select, func, insert
+from sqlalchemy import select
 
+from src.schemas.hotels import Hotel
 from repositories.base import BaseRopository
 from src.models.hotels import HotelsOrm
 
 
 class HotelsRepository(BaseRopository):
     model = HotelsOrm
+    schema = Hotel
 
-    async def get_all(self, location, title, limit, offset):
-        query = select(HotelsOrm)
+    async def get_all(self, location, title, limit, offset) -> list[Hotel]:
+        query = select(self.model)
         if title:
-            query = query.where(HotelsOrm.title.ilike(f"%{title}%"))
+            query = query.where(self.model.title.ilike(f"%{title}%"))
         if location:
-            query = query.where(HotelsOrm.location.ilike(f"%{location}%"))
+            query = query.where(self.model.location.ilike(f"%{location}%"))
         query = query.limit(limit).offset(offset)
         result = await self.session.execute(query)
-        return result.scalars().all()
-    
-    async def add(self, hotel_data):
-        add_hotel_stmt = (
-            insert(HotelsOrm)
-            .values(**hotel_data.model_dump())
-            .returning(HotelsOrm)
-        )
-        result = await self.session.execute(add_hotel_stmt)
-        hotel = result.scalars().first()
-        return hotel
+        return [self.schema.model_validate(model, from_attributes=True) for model in result.scalars().all()]

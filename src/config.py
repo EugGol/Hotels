@@ -16,5 +16,8 @@ class Setting(BaseSettings):
         env_file=Path(__file__).parent.parent / ".env",
         env_file_encoding="utf-8",
     )
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int
 
 settings = Setting()
