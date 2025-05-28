@@ -23,3 +23,14 @@ def get_current_user_id(token: str = Depends(get_token)):
     return data['user_id']
 
 UserIdDep = Annotated[int, Depends(get_current_user_id)]
+
+
+
+def get_db_manager():
+    return DBManager()
+
+async def get_db():
+    async with get_db_manager() as session:
+        yield session
+
+DBDep = Annotated[DBManager, Depends(get_db)]

@@ -1,12 +1,12 @@
 from pydantic import EmailStr
 from sqlalchemy import select
 
-from repositories.base import BaseRopository
+from repositories.base import BaseRepository
 from src.schemas.users import User, UserInDB
 from src.models.users import UsersOrm
 
 
-class UsersRepository(BaseRopository):
+class UsersRepository(BaseRepository):
     model = UsersOrm
     schema = User
 
